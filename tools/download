@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2155
+
+set -euo pipefail
+
+export THIS_DIR=$(
+  cd "$(dirname "${BASH_SOURCE[0]}")"
+  pwd
+)
+
+
+function download_one() {
+  repo="$1"
+  outdir="$2"
+
+  git clone --recursive "$repo" "$outdir"
+
+  find "$outdir" -iname ".git" -exec rm -rf {} \+
+  find "$outdir" -iname ".github" -exec rm -rf {} \+
+  find "$outdir" -iname ".gitignore" -exec rm -rf {} \+
+  find "$outdir" -iname ".gitmodules" -exec rm -rf {} \+
+  find "$outdir" -iname ".travis.yml" -exec rm -rf {} \+
+
+}
+
+mkdir -p "packages/vendor"
+cd "packages/vendor"
+
+
+
+download_one "https://github.com/rust-ndarray/ndarray"         "ndarray"
+
+cp -r "ndarray/ndarray-rand" .
+rm -rf "ndarray/ndarray-rand"
+
+sed -i'' -E 's|\[workspace\]||g' ndarray/Cargo.toml
+sed -i'' -E 's|members = \["ndarray-rand", "xtest-serialization", "xtest-blas", "xtest-numeric"\]||g' ndarray/Cargo.toml
+
+sed -i'' -E 's|ndarray = \{ .* \}||g' ndarray-rand/Cargo.toml
+
+
+
+
+download_one "https://github.com/rust-ndarray/ndarray-linalg"  "ndarray-linalg_"
+
+cp -r "ndarray-linalg_/lax" .
+cp -r "ndarray-linalg_/ndarray-linalg" .
+rm -rf "ndarray-linalg_"
+
+
+
+download_one "https://github.com/blas-lapack-rs/blas-src"      "blas-src"
+
+
+
+download_one "https://github.com/blas-lapack-rs/openblas-src"  "openblas-src_"
+
+cp -r "openblas-src_/openblas-src" .
+cp -r "openblas-src_/openblas-build" .
+rm -rf "openblas-src_"
+
+
+download_one "https://github.com/blas-lapack-rs/cblas-sys"     "cblas-sys"
+
+
+#download_one "https://github.com/blas-lapack-rs/blas"          "blas"
+#download_one "https://github.com/blas-lapack-rs/blas-sys"      "blas-sys"
+#download_one "https://github.com/blas-lapack-rs/cblas"         "cblas"
+#download_one "https://github.com/blas-lapack-rs/lapack"        "lapack"
+#download_one "https://github.com/blas-lapack-rs/lapack-src"    "lapack-src"
+#download_one "https://github.com/blas-lapack-rs/lapack-sys"    "lapack-sys"
+#download_one "https://github.com/blas-lapack-rs/lapacke"       "lapacke"
+#download_one "https://github.com/blas-lapack-rs/lapacke-sys"   "lapacke-sys"
+
+
+
+
+

@@ -1,0 +1,18 @@
+[package]
+name = "numrs"
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+lints.workspace = true
+publish.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["lib"]
+
+[dependencies]
+ndarray = { workspace = true }
